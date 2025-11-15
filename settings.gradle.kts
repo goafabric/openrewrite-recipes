@@ -1,1 +1,1 @@
-rootProject.name = "openrewrite"
+rootProject.name = "openrewrite-recipes"
