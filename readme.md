@@ -29,3 +29,10 @@
 
 - Openrewrite execution is currently only partly compatible with Kotlin 2.x Projects
   - https://github.com/openrewrite/rewrite/issues/6007
+
+# Links
+Spring Boot Upgrade Guide
+- https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide
+
+Official Openrewrite Docs
+- https://docs.openrewrite.org/
