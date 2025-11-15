@@ -54,6 +54,17 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+            <plugin>
+                <groupId>org.openrewrite.maven</groupId>
+                <artifactId>rewrite-maven-plugin</artifactId>
+                <version>6.23.0</version>
+                <configuration>
+                    <activeRecipes>
+                        <recipe>UpgradeSpringBoot_4_0</recipe>
+                        <recipe>UpgradeSpringBatch_6_0</recipe>
+                    </activeRecipes>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
