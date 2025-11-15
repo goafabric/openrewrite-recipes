@@ -1,5 +1,5 @@
-# Openrewrite Recipe
-- Mainly for Gradle Projects
+# Description
+- Openrewrite Recipe mainly for Gradle Projects
 - For a short Video see: https://youtu.be/HiiOVnhPx3I?si=h9etNakRzUDJON1N
 - Upgrades for 
   - Spring Boot 4.0.0(-RC1)
@@ -8,20 +8,20 @@
   - Kotlin Null Safety Fixes (starting point)
 - Configures for maximum backwords compatibility (e.g. Jackson)
  
-## Gradle Projects
+# Concerning Gradle Projects
 - Can be simply added to your projects by
   - Adding rewrite.yml
   - Adding Openrewrite Plugin to build.gradle(.kts)
   - Adding rewrite section with Recipes to build.gradle(.kts)
   - Executing ./gradlew rewriteRun
 
-## Maven Projects
+# Concerning Maven Projects
 - Though not yet designed for Maven, this recipe can be adopted
 - For an example see pom.xml
 - Sections in rewrite.yml need to me changed from "org.openrewrite.gradle" to "org.openrewrite.maven"
 - Execute mvn rewrite:run
 
-## Known Limitations
+# Known Limitations
 - Projects should be on Spring Boot 3.5 already
 
 - Openrewrite execution is currently not compatible with Java25
