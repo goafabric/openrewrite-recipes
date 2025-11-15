@@ -22,6 +22,8 @@
 - Execute mvn rewrite:run
 
 ## Known Limitations
+- Projects should be on Spring Boot 3.5 already
+
 - Openrewrite execution is currently not compatible with Java25
   - https://github.com/openrewrite/rewrite/issues/6132
 
