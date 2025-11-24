@@ -2,7 +2,7 @@
 - Openrewrite Recipe mainly for Gradle Projects
 - For a short Video see: https://youtu.be/HiiOVnhPx3I?si=h9etNakRzUDJON1N
 - Upgrades for 
-  - Spring Boot 4.0.0(-RC1)
+  - Spring Boot 4.0.0
   - Spring Batch
   - Adherent Starters for both implementation and test 
   - Kotlin Null Safety Fixes (starting point)
