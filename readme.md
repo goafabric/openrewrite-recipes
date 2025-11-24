@@ -7,6 +7,7 @@
   - Adherent Starters for both implementation and test 
   - Kotlin Null Safety Fixes (starting point)
 - Configures for maximum backwords compatibility (e.g. Jackson)
+- ApplicationBaseRuntimeHints features Native Runtime Hints currently missing in Spring Boot 4.0 Stack
  
 # Concerning Gradle Projects
 - Can be simply added to your projects by
