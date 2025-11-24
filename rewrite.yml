@@ -5,11 +5,11 @@ recipeList:
   # upgrade spring dependency
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: org.springframework.boot
-      newVersion: 4.0.0-RC1
+      newVersion: 4.0.0
 
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: org.hibernate.orm
-      newVersion: 7.1.4.Final
+      newVersion: 7.1.8.Final
 
   # add new starters with autoconfig
   - org.openrewrite.gradle.AddDependency:
@@ -80,12 +80,12 @@ recipeList:
 
   - org.openrewrite.text.FindAndReplace:
       find: "implementation\\([\"']net\\.ttddyy\\.observation:datasource-micrometer-spring-boot:[^\"']+[\"']\\)"
-      replace: "implementation(\"net.ttddyy.observation:datasource-micrometer-spring-boot:2.0.0-RC1\")"
+      replace: "implementation(\"net.ttddyy.observation:datasource-micrometer-spring-boot:2.0.0\")"
       regex: true
 
   - org.openrewrite.text.FindAndReplace:
       find: "implementation\\([\"']org\\.springdoc:springdoc-openapi-starter-webmvc-ui:[^\"']+[\"']\\)"
-      replace: "implementation(\"org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0-RC1\")"
+      replace: "implementation(\"org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0\")"
       regex: true
 
   # Spring Boot Imports
@@ -178,13 +178,6 @@ recipeList:
       replace: 'MemberCategory.ACCESS_DECLARED_FIELDS'
       filePattern: '**/*.java;**/*.kt'
 
-  # deactivate springdoc kotlin support for now
-  - org.openrewrite.yaml.MergeYaml:
-      filePattern: src/main/resources/application.yml
-      key: $
-      yaml: |
-        springdoc.enable-kotlin: false
-
   # shut of disconnected otel
   - org.openrewrite.yaml.MergeYaml:
       filePattern: src/main/resources/application.yml
@@ -197,6 +190,11 @@ recipeList:
       filePattern: "**/*RulesTest*"
       find: '.haveSimpleNameNotContaining("AuditTrailListener")'
       replace: '.haveSimpleNameNotContaining("AuditTrailListener").and().resideOutsideOfPackage("..persistence.entity..")'
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: "**/*RulesTest*"
+      find: '"com.fasterxml.jackson..",'
+      replace: '"com.fasterxml.jackson..","tools.jackson..",'
 
   # Kotlin
   - org.openrewrite.text.FindAndReplace:
@@ -263,6 +261,128 @@ recipeList:
       find: '.buildConsumerProperties(null)'
       replace: '.buildConsumerProperties()'
 
+  ########## Kotlin Hack Section ##########
+
+  # Kotlin Code Specific Hackz
+  - org.openrewrite.text.FindAndReplace:
+      find: 'response.body.'
+      replace: 'response.body!!.'
+      caseSensitive: true
+      filePattern: '**/*.kt'
+
+  - org.openrewrite.text.FindAndReplace: # websocket stuff
+      find: 'headers -> headers.addAll(headersMap)'
+      replace: 'headers -> headers.addAll(org.springframework.http.HttpHeaders.copyOf(headersMap))'
+      caseSensitive: true
+      filePattern: '**/*.kt'
+
+  - org.openrewrite.text.FindAndReplace: # spring data spec usage
+      filePattern: '**/*.kt'
+      find: '\.and\(((?:[\w$]+\.)*[\w$]+Spec\([^)]*\))\)'
+      replace: '.and($1!!)'
+      regex: true
+
+  - org.openrewrite.text.FindAndReplace: # kafka serialier
+      filePattern: '**/*.kt'
+      find: 'failedDeserializationInfo.headers.'
+      replace: 'failedDeserializationInfo.headers!!.'
+
+  - org.openrewrite.text.FindAndReplace: # kafka serialier
+      filePattern: '**/*It.kt'
+      find: 'StringDeserializer::class.qualifiedName'
+      replace: 'StringDeserializer::class.qualifiedName as Any'
+
+
+  # Kotlin Changetype Hackz
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.kt'
+      find: 'import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy'
+      replace: 'import org.springframework.boot.flyway.autoconfigure.FlywayMigrationStrategy'
+      caseSensitive: true
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.kt'
+      find: 'import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer'
+      replace: 'import org.springframework.boot.hibernate.autoconfigure.HibernatePropertiesCustomizer'
+      caseSensitive: true
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.kt'
+      find: 'import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration'
+      replace: 'import org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration'
+      caseSensitive: true
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.kt'
+      find: 'import org.springframework.boot.test.web.client.TestRestTemplate'
+      replace: 'import org.springframework.boot.resttestclient.TestRestTemplate'
+      caseSensitive: true
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.kt'
+      find: 'import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc'
+      replace: 'import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc'
+      caseSensitive: true
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.kt'
+      find: 'import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest'
+      replace: 'import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest'
+      caseSensitive: true
+
+  ####
+  #  Removal
+  - org.openrewrite.java.RemoveAnnotation:
+      annotationPattern: '@org.springframework.boot.test.autoconfigure.web.client.RestClientTest'
+
+
+  # TODO - Temp. Spring Data Fix
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.java;**/*.kt'
+      find: '(findBy\w+)IgnoreCase'
+      replace: '$1'
+      regex: true
+
+  # TODO: spring aws s3 crap
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: 'build.gradle.kts'
+      find: 'implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")'
+      replace: 'implementation("software.amazon.awssdk:s3:2.31.54") //implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")'
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.java;**/*.kt'
+      find: '@Import(AwsAutoConfiguration'
+      replace: '//@Import(AwsAutoConfiguration'
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.java;**/*.kt'
+      find: 'import io\.awspring\.cloud\.autoconfigure\.core\.AwsAutoConfiguration;?'
+      replace: ''
+      regex: true
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.java'
+      find: 'S3Client s3Client) {'
+      replace: '@org.springframework.beans.factory.annotation.Autowired(required = false) S3Client s3Client) {'
+
+  # check-integrity
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: 'build.gradle.kts'
+      find: '-check-integrity'
+      replace: '-Dspring.context.exit=onRefresh'
+
+  # otel, warning this needs changes in kubernetes configmap also !
+  - org.openrewrite.text.FindAndReplace:
+      find: management.otlp.tracing.endpoint
+      replace: management.opentelemetry.tracing.export.otlp.endpoint
+      filePattern: 'src/main/resources/application.yml'
+
+  # Document fix
+  - org.openrewrite.text.FindAndReplace:
+      find: spring.data.mongodb.
+      replace: spring.mongodb.
+      filePattern: 'src/main/resources/application.yml'
 
 ---
 type: specs.openrewrite.org/v1beta/recipe
@@ -352,3 +472,14 @@ recipeList:
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
       newFullyQualifiedTypeName: org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder
+
+  # Code specific changes
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*BatchConfiguration.java'
+      find: 'getTablePrefix()'
+      replace: 'org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX'
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*BatchConfiguration.java'
+      find: '@Override'
+      replace: ''

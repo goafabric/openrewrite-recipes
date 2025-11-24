@@ -1,7 +1,7 @@
 plugins {
 	java
 	war
-	id("org.springframework.boot") version "4.0.0-RC1"
+	id("org.springframework.boot") version "3.5.8"
 	id("io.spring.dependency-management") version "1.1.7"
     id("org.openrewrite.rewrite") version "7.20.0"
 }
@@ -12,7 +12,7 @@ description = "Demo project for Spring Boot"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
