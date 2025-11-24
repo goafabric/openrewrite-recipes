@@ -7,6 +7,9 @@ import org.springframework.aot.hint.TypeReference;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
 
+
+//Native Runtime Hints currrently missing in Spring Boot 4.0 Stack
+
 @Configuration
 @ImportRuntimeHints(ApplicationBaseRuntimeHints.class)
 public class ApplicationBaseRuntimeHints implements RuntimeHintsRegistrar {
